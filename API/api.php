@@ -11,7 +11,7 @@ require_once '../Services/ErrorHandler.php';
 // Initialize objects
 $db = Database::getInstance();
 $pdo = $db->getConnection();
-$userService = new UserService(new RoleManagerService(), new SecurityService(), new ErrorHandler(), $pdo);
+$userService = new UserService($pdo);
 
 // Get the HTTP method, path, and body of the request
 $method = $_SERVER['REQUEST_METHOD'];
@@ -20,7 +20,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 // Create SQL based on HTTP method
 switch ($method) {
     case 'GET':
-        $userService->addUser('testuser', 'test@example.com', 'password123');
+        $userService->addUser('testuser1', 'test1@example.com', 'password123');
         break;
     case 'PUT':
         // Handle PUT request

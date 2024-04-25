@@ -10,44 +10,121 @@
     class UserTest extends TestCase {
         private $userService;
         private $mockDb;
-        private $mockRoleManagerService;
-        private $mockSecurityService;
-        private $mockErrorHandler;
 
         protected function setUp(): void {
             parent::setUp();
             // Create mock objects for dependencies
-            $this->mockRoleManagerService = $this->createMock(RoleManagerService::class);
-            $this->mockSecurityService = $this->createMock(SecurityService::class);
-            $this->mockErrorHandler = $this->createMock(ErrorHandler::class);
             $this->mockDb = $this->createMock(PDO::class);
             // Create an instance of UserService with mock dependencies
-            $this->userService = new UserService($this->mockRoleManagerService, $this->mockSecurityService, $this->mockErrorHandler, $this->mockDb);
+            $this->userService = new UserService($this->mockDb);
         }
 
-        public function testAddUser(): void
-        {
-            // Mocking validateInput method of ErrorHandler
-            $this->mockErrorHandler->expects($this->once())
-                                   ->method('validateInput')
-                                   ->willReturn(true);
-
-            // Mocking hashPassword method of SecurityService
-            $this->mockSecurityService->expects($this->once())
-                                      ->method('hashPassword')
-                                      ->willReturn('hashedPassword123');
-            
-            // Mocking prepare and execute methods of PDO (database)
+        public function testAddUser(): void {
+            // Arrange
+            $username = 'testuser';
+            $email = 'test@example.com';
+            $password = 'password123';
+    
+            // Mocking execute method of PDOStatement
             $stmtMock = $this->createMock(PDOStatement::class);
             $stmtMock->expects($this->once())
-                    ->method('execute')
-                    ->willReturn(true);
+                     ->method('execute')
+                     ->willReturn(true);
+        
+            // Mocking prepare method of PDO
             $this->mockDb->expects($this->once())
-                        ->method('prepare')
-                        ->willReturn($stmtMock);
-
-            $this->assertTrue($this->userService->addUser('testuser', 'test@example.com', 'password123'));
-
+                         ->method('prepare')
+                         ->willReturn($stmtMock);
+        
+            // Act
+            $result = $this->userService->addUser($username, $email, $password);
+        
+            // Assert
+            $this->assertTrue($result['success']);
+            $this->assertEquals('User added successfully', $result['message']);
         }
+        
+        
+
+        public function testEditUser(): void {
+            // Arrange
+            $userId = 1;
+            $newUsername = 'newusername';
+            $newEmail = 'newemail@example.com';
+            $newPassword = 'newpassword123';
+        
+            // Mocking execute method of PDOStatement
+            $stmtMock = $this->createMock(PDOStatement::class);
+            $stmtMock->expects($this->once())
+                     ->method('execute')
+                     ->willReturn(true);
+        
+            // Mocking prepare method of PDO
+            $this->mockDb->expects($this->once())
+                         ->method('prepare')
+                         ->willReturn($stmtMock);
+        
+            // Act
+            $result = $this->userService->editUser($userId, $newUsername, $newEmail, $newPassword);
+        
+            // Assert
+            $this->assertTrue($result['success']);
+            $this->assertEquals('User updated successfully', $result['message']);
+        }
+        
+        
+        public function testDeleteUser(): void {
+            // Arrange
+            $userId = 1;
+        
+            // Mocking execute method of PDOStatement
+            $stmtMock = $this->createMock(PDOStatement::class);
+            $stmtMock->expects($this->once())
+                     ->method('execute')
+                     ->with([$userId])
+                     ->willReturn(true);
+        
+            // Mocking prepare method of PDO
+            $this->mockDb->expects($this->once())
+                         ->method('prepare')
+                         ->with("DELETE FROM users WHERE id=?")
+                         ->willReturn($stmtMock);
+        
+            // Act
+            $result = $this->userService->deleteUser($userId);
+        
+            // Assert
+            $this->assertTrue($result['success']);
+            $this->assertEquals('User deleted successfully', $result['message']);
+        }
+        
+        
+        public function testAssignRole(): void {
+            // Arrange
+            $userId = 1;
+            $role = 'role';
+        
+            // Act
+            $result = $this->userService->assignRole($userId, $role);
+        
+            // Assert
+            $this->assertTrue($result['success']);
+            $this->assertEquals('Role assigned successfully', $result['message']);
+        }
+        
+        public function testRemoveRole(): void {
+            // Arrange
+            $userId = 1;
+            $role = 'role';
+        
+            // Act
+            $result = $this->userService->removeRole($userId, $role);
+        
+            // Assert
+            $this->assertTrue($result['success']);
+            $this->assertEquals('Role removed successfully', $result['message']);
+        }
+     
     }
+
 ?>
