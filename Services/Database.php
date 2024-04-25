@@ -12,7 +12,7 @@
 
             // instantiate database
 			
-			$try{
+			try{
                 $this->conn = new PDO("mysql:host={$this->host};dbname={$this->dbname}", $this->user, $this->pass);
                 $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch(PDOException $e){
@@ -24,7 +24,7 @@
             if(!self::$instance){
                 self::$instance = new Database();
             }
-            return self.$instance;
+            return self::$instance;
         }
 
         public function getConnection(){
