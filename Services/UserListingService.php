@@ -23,9 +23,9 @@
                 return ['success' => false, 'message' => 'Invalid input'];
             }
             // Sanitized input
-            $page = $securityService->preventXSS($page);
+            $page = $this->securityService->preventXSS($page);
 
-            $perPage = $securityService->preventXSS($perPage);
+            $perPage = $this->securityService->preventXSS($perPage);
             // Display list of users in tabular format
             $users = $this->paginationService->paginateUsers($page, $perPage);
             return $users;

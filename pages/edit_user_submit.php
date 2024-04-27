@@ -1,4 +1,5 @@
 <?php
+include "../baseUrl.php";
 session_start();
 
 // Check if user is logged in
@@ -30,7 +31,7 @@ function sendRequest($url, $method = 'GET', $data = null) {
 }
 
 // API endpoint for adding a user
-$addUserUrl = 'ums.local/api.php/edit-users';
+$addUserUrl = $baseUrl. 'edit-users';
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

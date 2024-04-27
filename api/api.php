@@ -1,7 +1,11 @@
 <?php
+// require_once '../vendor/autoload.php';
 
-require_once 'Controllers/UserController.php';
-require_once 'Controllers/AuthController.php';
+// // Looing for .env at the root directory
+// $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+// $dotenv->load();
+require_once '../Controllers/UserController.php';
+require_once '../Controllers/AuthController.php';
 
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 $path = $_SERVER['PATH_INFO'];

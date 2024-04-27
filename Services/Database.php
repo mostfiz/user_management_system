@@ -1,4 +1,5 @@
 <?php
+
     class Database{
 
         private static $instance = null;
@@ -8,10 +9,10 @@
         private $user = "root";
         private $pass = "";
         private $dbname = "user_management_system";
+        
         public function __construct(){
 
             // instantiate database
-			
 			try{
                 $this->conn = new PDO("mysql:host={$this->host};dbname={$this->dbname}", $this->user, $this->pass);
                 $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

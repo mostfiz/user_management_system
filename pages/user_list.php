@@ -1,4 +1,5 @@
 <?php
+include "../baseUrl.php";
 session_start();
 
 // Check if user is logged in
@@ -32,7 +33,7 @@ function sendRequest($url, $method = 'GET', $data = null) {
 // API endpoint to fetch user data
 $perPage = 5; // Change this as needed
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
-$getUserUrl = "ums.local/api.php/paginate-user?page=$page&perPage=$perPage";
+$getUserUrl = $baseUrl. "paginate-user?page=$page&perPage=$perPage";
 
 // Fetch user data from API
 $userData = json_decode(sendRequest($getUserUrl), true);

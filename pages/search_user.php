@@ -1,4 +1,6 @@
 <?php
+
+include "../baseUrl.php";
 session_start();
 
 // Check if user is logged in
@@ -30,7 +32,7 @@ function sendRequest($url, $method = 'GET', $data = null) {
 }
 
 // API endpoint to search for user
-$searchUserUrl = 'ums.local/api.php/search-users';
+$searchUserUrl = $baseUrl. 'search-users';
 
 // Initialize variables
 $searchResults = [];
@@ -41,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['search'])) {
         $keyword = $_POST['keyword'];
         $data = json_encode(array('keyword' => $keyword));
-        print $response = sendRequest($searchUserUrl, 'POST', $data);
+        $response = sendRequest($searchUserUrl, 'POST', $data);
         $responseData = json_decode($response, true);
         if ($responseData && isset($responseData['success']) && $responseData['success'] === true) {
             $searchResults = $responseData['users'];

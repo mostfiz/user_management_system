@@ -1,4 +1,5 @@
 <?php
+include "../baseUrl.php";
 session_start();
 
 // Check if user is logged in
@@ -31,7 +32,7 @@ function sendRequest($url, $method = 'GET', $data = null) {
 
 // API endpoint to fetch user data
 $userId = $_GET['id'];
-$getUserUrl = "ums.local/api.php/getUser?id=$userId";
+$getUserUrl = $baseUrl. "getUser?id=$userId";
 
 // Fetch user data from API
 $userData = json_decode(sendRequest($getUserUrl), true);

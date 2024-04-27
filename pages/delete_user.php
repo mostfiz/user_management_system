@@ -1,4 +1,5 @@
 <?php
+include "../baseUrl.php";
 session_start();
 
 // Check if user is logged in
@@ -30,7 +31,7 @@ function sendRequest($url, $method = 'GET', $data = null) {
 }
 
 // API endpoint to delete user
-$deleteUserUrl = 'ums.local/api.php/delete-users';
+$deleteUserUrl = $baseUrl. 'delete-users';
 
 // Handle user deletion
 
