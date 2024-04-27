@@ -27,6 +27,9 @@ This is a User Management System project developed using PHP. It provides functi
     - **private $dbname** = "user_management_system";
 
 5. Serve the application using PHP's built-in server or configure it with your preferred web server.
+## Demo login
+- **username**: test
+- **Password**: test
 
 ## Usage
 - **Login** Access the login page to authenticate users..
