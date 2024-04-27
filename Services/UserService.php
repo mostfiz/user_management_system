@@ -48,7 +48,7 @@
         public function editUser($userId, $newUsername, $newEmail, $newPassword) {
             try{
                 // Validate input
-                if (!$this->errorHandler->validateInput([$newUsername, $newEmail, $newPassword])) {
+                if (!$this->errorHandler->validateInput([$newUsername, $newEmail, $newPassword, $userId])) {
                     return ['success' => false, 'message' => 'Invalid input'];
                 }
             
@@ -70,11 +70,16 @@
 
         public function deleteUser($userId) {
             try{
+                 // Validate input
+                 if (!$this->errorHandler->validateInput([$userId])) {
+                    return ['success' => false, 'message' => 'Invalid input'];
+                }
                 // Delete user from the database
                 $stmt = $this->db->prepare("DELETE FROM users WHERE id=?");
+                // Remove all roles assigned to the user
+                $this->roleManagerService->removeAllRoles($userId);
                 if ($stmt->execute([$userId])) {
-                    // Remove all roles assigned to the user
-                    $this->roleManagerService->removeAllRoles($userId);
+                    
                     return ['success' => true, 'message' => 'User deleted successfully'];
                 } else {
                     return ['success' => false, 'message' => 'Failed to delete user'];

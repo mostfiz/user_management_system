@@ -2,37 +2,63 @@
     require_once 'RoleManagerService.php';
     require_once 'SecurityService.php';
     require_once 'ErrorHandler.php';
+    require_once 'PaginationService.php';
+    
     class UserListingService {
         private $paginationService;
-        private $roleManagerService;
-    
-        public function __construct($roleManagerService, $paginationService) {
-            $this->paginationService = $paginationService;
-            $this->roleManagerService = $roleManagerService;
+        private $db;
+
+        public function __construct($db) {
+            $this->paginationService = new PaginationService($db);
+            $this->errorHandler = new ErrorHandler();
+            $this->db = $db;
         }
     
-        public function displayUsers(int $page, int $perPage): array {
+        public function displayUsers($page, $perPage): array {
+            // Validate input
+            if (!$this->errorHandler->validateInput([$page, $perPage])) {
+                return ['success' => false, 'message' => 'Invalid input'];
+            }
             // Display list of users in tabular format
             $users = $this->paginationService->paginateUsers($page, $perPage);
             return $users;
         }
     
-        public function searchUsers(string $keyword): array {
-            // Prepare the SQL query to search for users by username or email
-            $query = "SELECT * FROM users WHERE username LIKE ? OR email LIKE ?";
-            $stmt = $this->db->prepare($query);
+        public function getUser($userId) {
+            // Assuming there's a database table named 'user_roles' with columns 'user_id' and 'role'
             
-            // Bind the search keyword to the query
-            $keyword = "%$keyword%"; // Add wildcard characters to search for partial matches
-            $stmt->bindParam(1, $keyword, PDO::PARAM_STR);
-            $stmt->bindParam(2, $keyword, PDO::PARAM_STR);
+            // Validate input
+            if (!$this->errorHandler->validateInput([$userId])) {
+                return ['success' => false, 'message' => 'Invalid input'];
+            }
             
-            // Execute the query
+            // Retrieve the role from the 'user_roles' table
+            $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$userId]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Check if a role was found for the user
+            if ($user) {
+                return ['success' => true, 'user' => $user];
+            } else {
+                return ['success' => false, 'message' => 'User not found'];
+            }
+        }
+        public function searchUsers($keyword): array {
+
+            // Validate input
+            if (!$this->errorHandler->validateInput([$keyword])) {
+                return ['success' => false, 'message' => 'Invalid input'];
+            }
+            // Prepare SQL query to search for users by username or email
+            $sql = "SELECT username, email FROM users WHERE username LIKE :keyword OR email LIKE :keyword";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
             $stmt->execute();
-            
-            // Fetch the users
+    
+            // Fetch the matching users
             $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+            unset($users['password']); // Remove password for security
             // Check if any users were found
             if ($users) {
                 return ['success' => true, 'users' => $users];

@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Check if login is successful
     $responseData = json_decode($response, true);
+    print_r($responseData);
     if ($responseData['success']) {
         // Set session variable to indicate user is logged in
         $_SESSION['username'] = $username;
@@ -58,9 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <header class="header">
+        <h1>User Management System</h1>
+    </header>
+    <div class="login-container">
         <h2>Login</h2>
-        <form action="login.php" method="post">
+        <form action="login.php" method="post" class="login-form">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -77,3 +81,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </body>
 </html>
+

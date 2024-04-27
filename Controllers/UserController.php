@@ -2,18 +2,18 @@
 
 require_once __DIR__ . '/../Services/UserService.php';
 require_once __DIR__ . '/../Services/Database.php';
-require_once __DIR__ . '/../Services/PaginationService.php';
+require_once __DIR__ . '/../Services/UserListingService.php';
 
 class UserController {
     private $userService;
-    private $paginationService;
+    private $userListingService;
 
     public function __construct() {
 
         $db = Database::getInstance();
         $pdo = $db->getConnection();
         $this->userService = new UserService($pdo);
-        $this->paginationService = new PaginationService($pdo);
+        $this->userListingService = new UserListingService($pdo);
     }
 
     public function addUser() {
@@ -49,20 +49,26 @@ class UserController {
     }
 
     public function getPaginateUsers(){
-        $data = json_decode(file_get_contents("php://input"), true);
-        $page = $data['page'] ?? '';
-        $perPage = $data['perPage'] ?? '';
+        // $data = json_decode(file_get_contents("php://input"), true);
+        $page = $_GET['page'] ?? '';
+        $perPage = $_GET['perPage'] ?? '';
 
-        $response = $this->paginationService->paginateUsers($page, $perPage);
+        $response = $this->userListingService->displayUsers($page, $perPage);
 
         echo json_encode($response);
     }
-
     public function getUser(){
+        // $data = json_decode(file_get_contents("php://input"), true);
+        $id = $_GET['id'] ?? '';
+        $response = $this->userListingService->getUser($id);
+
+        echo json_encode($response);
+    }
+    public function searchUser(){
         $data = json_decode(file_get_contents("php://input"), true);
-        $page = $data['keyword'] ?? '';
+        $keyword = $data['keyword'] ?? '';
         
-        $response = $this->paginationService->paginateUsers($page, $perPage);
+        $response = $this->userListingService->searchUsers($keyword);
 
         echo json_encode($response);
     }
