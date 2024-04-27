@@ -37,11 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Check if login is successful
     $responseData = json_decode($response, true);
-    print_r($responseData);
     if ($responseData['success']) {
         // Set session variable to indicate user is logged in
         $_SESSION['username'] = $username;
-        header("Location: admin_panel.php"); // Redirect to admin panel upon successful login
+        header("Location: pages/admin_panel.php"); // Redirect to admin panel upon successful login
         exit();
     } else {
         // Display error message if login fails

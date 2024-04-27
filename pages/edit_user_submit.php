@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -29,18 +29,29 @@ function sendRequest($url, $method = 'GET', $data = null) {
     return $response;
 }
 
-// API endpoint to delete user
-$deleteUserUrl = 'ums.local/api.php/delete-users';
+// API endpoint for adding a user
+$addUserUrl = 'ums.local/api.php/edit-users';
 
-// Handle user deletion
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate form data
-    if (isset($_GET['id'])) {
-        $userId = $_GET['id'];
-        $data = json_encode(array('userId' => $userId));
-        $response = sendRequest($deleteUserUrl, 'POST', $data);
-        
+    if (isset($_POST['username'], $_POST['email'], $_POST['password'], $_POST['userId'])) {
+        $username = $_POST['username'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $userId = $_POST['userId'];
+
+        // Prepare data for API request
+        $data = json_encode(array(
+            'newUsername' => $username,
+            'newEmail' => $email,
+            'newPassword' => $password,
+            'userId' => $userId
+
+        ));
+
+        // Send API request to add user
+        $response = sendRequest($addUserUrl, 'POST', $data);
         // Process API response
         if ($response) {
             $responseData = json_decode($response, true);
@@ -52,19 +63,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             } else {
                 // Error adding user
                 // Redirect back to add user page with error message
-                header("Location: user_list.php?error=Failed to delete user");
+                header("Location: edit_user.php?error=Failed to add user");
                 exit();
             }
         } else {
             // Failed to connect to API
             // Redirect back to add user page with error message
-            header("Location: user_list.php?error=Failed to connect to API");
+            header("Location: edit_user.php?error=Failed to connect to API");
             exit();
         }
     } else {
         // Required form fields missing
         // Redirect back to add user page with error message
-        header("Location: user_list.php?error=Please fill in all required fields");
+        header("Location: edit_user.php?error=Please fill in all required fields");
         exit();
     }
 }

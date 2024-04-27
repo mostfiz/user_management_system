@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -30,28 +30,21 @@ function sendRequest($url, $method = 'GET', $data = null) {
 }
 
 // API endpoint to fetch user data
-$userId = $_GET['id'];
-$getUserUrl = "ums.local/api.php/getUser?id=$userId";
+$perPage = 5; // Change this as needed
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+$getUserUrl = "ums.local/api.php/paginate-user?page=$page&perPage=$perPage";
 
 // Fetch user data from API
 $userData = json_decode(sendRequest($getUserUrl), true);
 
 // Check if user data is retrieved successfully
 if ($userData && isset($userData['success']) && $userData['success'] === true) {
-    $user = $userData['user'];
+    $users = $userData['users'];
 } else {
     // Handle error if user data retrieval fails
     $errorMessage = isset($userData['message']) ? $userData['message'] : 'Failed to fetch user data';
-    // Redirect back to user list page or display error message
     header("Location: user_list.php?error=$errorMessage");
     exit();
-}
-
-// Handle form submission for updating user data
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Process form data and update user via API
-    // Extract form data and make API call to update user
-    // Redirect back to user list page or display success/error message
 }
 ?>
 
@@ -60,13 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit User</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>User List</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <!-- Add any additional stylesheets or scripts here -->
 </head>
 <body>
 <div class="header">
-        <h1>Edit User</h1>
+        <h1>Add User</h1>
         <div class="user-info">
             Logged in as: <strong><?php echo $_SESSION['username']; ?></strong> | <a href="logout.php">Logout</a>
         </div>
@@ -80,24 +73,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </ul>
         </div>
         <div class="content">
-            <form action="edit_user_submit.php" method="post">
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" name="username" placeholder="Username" value="<?php echo $user['username']; ?>" required>
-                    <input type="hidden" name="userId" value="<?php echo $user['id']; ?>" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" name="email" placeholder="Email" value="<?php echo $user['email']; ?>" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Pass:</label>
-                    <input type="password" name="password" placeholder="Password" value="<?php echo $user['password']; ?>" required>
-                </div>
-                <!-- Add other input fields as needed -->
-                <button type="submit" name="update_user">Update User</button>
-            </form>
-            <!-- Edit user form -->
+            <div class="user-list">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?php echo $user['id']; ?></td>
+                                <td><?php echo $user['username']; ?></td>
+                                <td><?php echo $user['email']; ?></td>
+                                <td>
+                                    <a href="edit_user.php?id=<?php echo $user['id']; ?>">Edit</a> |
+                                    <a href="delete_user.php?id=<?php echo $user['id']; ?>">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination links -->
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="user_list.php?page=<?php echo $page - 1; ?>">Previous</a>
+                <?php endif; ?>
+                <?php if (count($users) >= $perPage): ?>
+                    <a href="user_list.php?page=<?php echo $page + 1; ?>">Next</a>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
     <!-- Add any additional HTML markup or scripts here -->

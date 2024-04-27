@@ -6,11 +6,14 @@
     
     class UserListingService {
         private $paginationService;
+        private $errorHandler;
+        private $securityService;
         private $db;
 
         public function __construct($db) {
             $this->paginationService = new PaginationService($db);
             $this->errorHandler = new ErrorHandler();
+            $this->securityService = new SecurityService();
             $this->db = $db;
         }
     
@@ -19,6 +22,10 @@
             if (!$this->errorHandler->validateInput([$page, $perPage])) {
                 return ['success' => false, 'message' => 'Invalid input'];
             }
+            // Sanitized input
+            $page = $securityService->preventXSS($page);
+
+            $perPage = $securityService->preventXSS($perPage);
             // Display list of users in tabular format
             $users = $this->paginationService->paginateUsers($page, $perPage);
             return $users;
@@ -31,7 +38,10 @@
             if (!$this->errorHandler->validateInput([$userId])) {
                 return ['success' => false, 'message' => 'Invalid input'];
             }
-            
+
+            // Sanitized input
+            $userId = $this->securityService->preventXSS($userId);
+
             // Retrieve the role from the 'user_roles' table
             $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ?");
             $stmt->execute([$userId]);
@@ -50,8 +60,12 @@
             if (!$this->errorHandler->validateInput([$keyword])) {
                 return ['success' => false, 'message' => 'Invalid input'];
             }
+
+            // Sanitized input
+            $keyword = $this->securityService->preventXSS($keyword);
+
             // Prepare SQL query to search for users by username or email
-            $sql = "SELECT username, email FROM users WHERE username LIKE :keyword OR email LIKE :keyword";
+            $sql = "SELECT id, username, email FROM users WHERE username LIKE :keyword OR email LIKE :keyword";
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
             $stmt->execute();

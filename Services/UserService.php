@@ -29,6 +29,10 @@
                     return ['success' => false, 'message' => 'Invalid input'];
                 }
             
+                // Sanitized input
+                $username = $this->securityService->preventXSS($username);
+                $email = $this->securityService->preventXSS($email);
+                $password = $this->securityService->preventXSS($password);
                 // Hash the password
                 $hashedPassword = $this->securityService->hashPassword($password);
             
@@ -52,6 +56,11 @@
                     return ['success' => false, 'message' => 'Invalid input'];
                 }
             
+                // Sanitized input
+                $newUsername = $this->securityService->preventXSS($newUsername);
+                $newEmail = $this->securityService->preventXSS($newEmail);
+                $newPassword = $this->securityService->preventXSS($newPassword);
+                $userId = $this->securityService->preventXSS($userId);
                 // Hash the new password
                 $hashedPassword = $this->securityService->hashPassword($newPassword);
             
@@ -74,6 +83,8 @@
                  if (!$this->errorHandler->validateInput([$userId])) {
                     return ['success' => false, 'message' => 'Invalid input'];
                 }
+                // Sanitized input
+                $userId = $this->securityService->preventXSS($userId);
                 // Delete user from the database
                 $stmt = $this->db->prepare("DELETE FROM users WHERE id=?");
                 // Remove all roles assigned to the user

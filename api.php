@@ -18,7 +18,7 @@ switch ($requestMethod) {
         }
         elseif($path === '/paginate-user'){
             $userController->getPaginateUsers();
-        }elseif ($path === '/get-users') {
+        }elseif ($path === '/search-users') {
             $userController->searchUser();
         }elseif ($path === '/edit-users') {
             $userController->editUser();
